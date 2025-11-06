@@ -1,8 +1,8 @@
-import pLimit from 'p-limit';
-import type { Logger } from 'pino';
-import type { FetchAllPagesResult, GeoParams, SerperNewsItem } from '../../schema';
-import { fetchSerperPage } from './client';
-import { config } from './config';
+import pLimit from "p-limit";
+import type { Logger } from "pino";
+import type { FetchAllPagesResult, GeoParams, SerperNewsItem } from "../../schema";
+import { fetchSerperPage } from "./client";
+import { config } from "./config";
 
 // Create a concurrency limiter for parallel processing of multiple publications
 export const publicationLimit = pLimit(config.concurrencyLimit);
@@ -34,7 +34,7 @@ export async function fetchAllPagesForUrl(
     // Extract hostname robustly
     siteQuery = `site:${new URL(url).hostname}`;
   } catch (e: unknown) {
-    urlLogger.error({ err: e }, 'Invalid URL format provided');
+    urlLogger.error({ err: e }, "Invalid URL format provided");
     return {
       url,
       queriesMade: 0,
@@ -45,11 +45,12 @@ export async function fetchAllPagesForUrl(
     };
   }
 
-  urlLogger.info({ maxQueries: maxQueriesForThisUrl }, 'Starting iterative fetch for URL');
+  urlLogger.info({ maxQueries: maxQueriesForThisUrl }, "Starting iterative fetch for URL");
 
   let queriesMade = 0;
   let totalCredits = 0;
   const aggregatedResults: SerperNewsItem[] = [];
+  const seenUrls = new Set<string>(); // Track seen URLs to detect duplicates
 
   // Sequential fetch approach to respect stopping conditions
   let currentPage = 1;
@@ -57,13 +58,13 @@ export async function fetchAllPagesForUrl(
   while (currentPage <= maxQueriesForThisUrl) {
     // 1. Check per-URL query limit
     if (queriesMade >= maxQueriesForThisUrl) {
-      urlLogger.info({ queriesMade }, 'Reached max queries limit for this URL. Stopping.');
+      urlLogger.info({ queriesMade }, "Reached max queries limit for this URL. Stopping.");
       break;
     }
 
     const pageLogger = urlLogger.child({ page: currentPage });
     try {
-      pageLogger.info('Fetching page (credit reserved)');
+      pageLogger.info("Fetching page (credit reserved)");
       const pageResult = await fetchSerperPage(
         siteQuery,
         tbs,
@@ -84,25 +85,12 @@ export async function fetchAllPagesForUrl(
           requestedResults: config.resultsPerPage,
           page: currentPage,
           siteQuery,
-          hasMoreResults: newsCount === config.resultsPerPage,
           totalResultsSoFar: aggregatedResults.length,
         },
-        'Page fetch successful.'
+        "Page fetch successful."
       );
 
-      if (newsCount > 0) {
-        aggregatedResults.push(...pageResult.news);
-
-        // Add safety check for maximum results per publication
-        if (aggregatedResults.length >= config.maxResultsPerPublication) {
-          pageLogger.warn(
-            `STOPPING FETCHES: Reached maximum results limit (${aggregatedResults.length}/${config.maxResultsPerPublication}) for this publication. This is a safety limit - if time filters were working properly, we would expect fewer results for narrow time ranges.`
-          );
-          break;
-        }
-      }
-
-      // 3. Check stopping conditions based on results
+      // Check stopping condition: no results
       if (newsCount === 0) {
         pageLogger.info(
           `STOPPING FETCHES: Found 0 results on page ${currentPage}. Total results fetched: ${aggregatedResults.length}.`
@@ -110,18 +98,62 @@ export async function fetchAllPagesForUrl(
         break;
       }
 
-      if (newsCount < config.resultsPerPage) {
-        pageLogger.info(
-          `STOPPING FETCHES: Found fewer results (${newsCount}) than requested (${config.resultsPerPage}) on page ${currentPage}. Total results fetched: ${aggregatedResults.length}. This is expected behavior when reaching the end of available results.`
+      // Process results and check for duplicates
+      if (newsCount > 0) {
+        let duplicatesOnPage = 0;
+        const newResults: SerperNewsItem[] = [];
+
+        for (const item of pageResult.news) {
+          const itemUrl = item.link;
+          if (seenUrls.has(itemUrl)) {
+            duplicatesOnPage++;
+          } else {
+            seenUrls.add(itemUrl);
+            newResults.push(item);
+          }
+        }
+
+        // Check if >50% of results on this page are duplicates
+        const duplicatePercentage = (duplicatesOnPage / newsCount) * 100;
+        if (duplicatePercentage > 50) {
+          pageLogger.info(
+            `STOPPING FETCHES: Found ${duplicatePercentage.toFixed(
+              1
+            )}% duplicates (${duplicatesOnPage}/${newsCount}) on page ${currentPage}. Total unique results fetched: ${
+              aggregatedResults.length + newResults.length
+            }.`
+          );
+          // Still add the new results before stopping
+          aggregatedResults.push(...newResults);
+          break;
+        }
+
+        aggregatedResults.push(...newResults);
+
+        pageLogger.debug(
+          {
+            duplicatesOnPage,
+            newResultsOnPage: newResults.length,
+            duplicatePercentage: duplicatePercentage.toFixed(1),
+            totalUniqueResults: aggregatedResults.length,
+          },
+          "Processed page results"
         );
-        break;
+
+        // Add safety check for maximum results per publication
+        if (aggregatedResults.length >= config.maxResultsPerPublication) {
+          pageLogger.warn(
+            `STOPPING FETCHES: Reached maximum results limit (${aggregatedResults.length}/${config.maxResultsPerPublication}) for this publication.`
+          );
+          break;
+        }
       }
 
       currentPage++;
     } catch (error: unknown) {
       pageLogger.error(
         { err: error },
-        'Failed to fetch page after retries. Stopping fetch for this URL.'
+        "Failed to fetch page after retries. Stopping fetch for this URL."
       );
       return {
         url,
@@ -136,7 +168,7 @@ export async function fetchAllPagesForUrl(
 
   urlLogger.info(
     { queriesMade, totalResults: aggregatedResults.length, totalCredits },
-    'Finished fetching for URL.'
+    "Finished fetching for URL."
   );
   return { url, queriesMade, credits: totalCredits, results: aggregatedResults, tbsParams: tbs };
 }
