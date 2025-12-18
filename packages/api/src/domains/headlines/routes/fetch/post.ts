@@ -15,10 +15,10 @@ const fetchSchema = z.object({
 export async function fetchHeadlinesHandler(
   c: Context<AuthenticatedAppContext>
 ) {
-  const data = await c.req.json().then((data) => fetchSchema.parse(data));
+  const body = await c.req.json().then((body) => fetchSchema.parse(body));
   const result = await fetchHeadlines(
-    { database: c.env.DATABASE_URL, serperApiKey: c.env.SERPER_API_KEY },
-    data
+    { serperApiKey: c.env.SERPER_API_KEY },
+    body
   );
   return c.json({ success: true, data: result, error: null }, 200);
 }

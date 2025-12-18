@@ -1,6 +1,10 @@
 import { subDays, subHours, subMonths, subWeeks, subYears } from "date-fns";
 import { parseMmDdYyyy } from "./parsers";
 
+// Regex constants for TBS parsing
+const CD_MIN_REGEX = /cd_min:([^,]+)/;
+const CD_MAX_REGEX = /cd_max:([^,]+)/;
+
 /**
  * Convert TBS (time-based search) parameter to a date range
  */
@@ -28,8 +32,8 @@ export function tbsToDateRange(tbs: string): { start: Date; end: Date } {
     default:
       // Attempt to parse custom 'cd_min' and 'cd_max'
       {
-        const minMatch = tbs.match(/cd_min:([^,]+)/);
-        const maxMatch = tbs.match(/cd_max:([^,]+)/);
+        const minMatch = tbs.match(CD_MIN_REGEX);
+        const maxMatch = tbs.match(CD_MAX_REGEX);
 
         let customStart: Date | null = null;
         let customEnd: Date | null = null;

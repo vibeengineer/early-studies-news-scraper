@@ -1,10 +1,10 @@
 import pLimit from "p-limit";
 import { parseSerperDate } from "../../utils/date/parsers";
 import { datesToTbsString, getGeoParams } from "../../utils/date/search-params";
-import { fetchAllPagesForUrl } from "./serper/fetchAllPages";
+import { fetchAllPagesForUrl } from "./serper/fetch-all-pages";
 
 export async function fetchHeadlines(
-  { database, serperApiKey }: { database: string; serperApiKey: string },
+  { serperApiKey }: { serperApiKey: string },
   {
     startDate,
     endDate,
@@ -76,10 +76,14 @@ export async function fetchHeadlines(
       })
       .filter((item) => {
         // Apply date filtering with a 2-day buffer
-        if (!item.normalizedDate) return false;
+        if (!item.normalizedDate) {
+          return false;
+        }
 
         const parts = item.normalizedDate.split("/");
-        if (parts.length !== 3) return false;
+        if (parts.length !== 3) {
+          return false;
+        }
 
         const day = Number.parseInt(parts[0], 10);
         const month = Number.parseInt(parts[1], 10) - 1;

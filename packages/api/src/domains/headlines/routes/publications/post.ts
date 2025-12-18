@@ -13,10 +13,10 @@ const createSchema = z.object({
 export async function createPublicationHandler(
   c: Context<AuthenticatedAppContext>
 ) {
-  const data = await c.req.json().then((data) => createSchema.parse(data));
+  const body = await c.req.json().then((body) => createSchema.parse(body));
   const publication = await insertPublication(
     { database: c.env.DATABASE_URL },
-    data
+    body
   );
   return c.json({ success: true, data: { publication }, error: null }, 201);
 }

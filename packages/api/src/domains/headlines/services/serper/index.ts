@@ -1,11 +1,3 @@
-import { fetchSerperAccountDetails, fetchSerperPage } from "./client";
-import { config } from "./config";
-import { fetchAllPagesForUrl, publicationLimit } from "./fetchAllPages";
-
-export {
-  fetchSerperPage,
-  fetchSerperAccountDetails,
-  fetchAllPagesForUrl,
-  publicationLimit,
-  config,
-};
+export { fetchSerperAccountDetails, fetchSerperPage } from "./client";
+export { config } from "./config";
+export { fetchAllPagesForUrl, publicationLimit } from "./fetch-all-pages";

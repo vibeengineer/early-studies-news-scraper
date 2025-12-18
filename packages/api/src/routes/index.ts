@@ -35,7 +35,7 @@ export function createAppRouter() {
   });
 
   // API root route
-  app.get("/", async (c) => {
+  app.get("/", (c) => {
     const logger = c.get("logger");
     logger.info(
       { headers: Object.fromEntries(c.req.raw.headers.entries()) },

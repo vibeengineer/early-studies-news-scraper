@@ -10,6 +10,10 @@ import {
   subYears,
 } from "date-fns";
 
+// Regex for parsing relative time formats
+const RELATIVE_TIME_REGEX =
+  /(\d+)\s+(second|minute|hour|day|week|month|year)s?\s+ago/i;
+
 /**
  * Maps date range option to a date range with start and end dates
  */
@@ -47,8 +51,10 @@ export function getDateRange(dateRangeOption: string): {
 /**
  * Parses a date string in DD/MM/YYYY format
  */
-export function parseDdMmYyyy(dateString?: string): Date | undefined {
-  if (!dateString) return;
+export function parseDdMmYyyy(dateString?: string): Date | null {
+  if (!dateString) {
+    return null;
+  }
 
   try {
     const parsed = parse(dateString, "dd/MM/yyyy", new Date());
@@ -117,9 +123,7 @@ export function parseSerperDate(dateString?: string | null): Date | null {
 
   try {
     // Try parsing relative formats like "X units ago"
-    const relativeMatch = dateString.match(
-      /(\d+)\s+(second|minute|hour|day|week|month|year)s?\s+ago/i
-    );
+    const relativeMatch = dateString.match(RELATIVE_TIME_REGEX);
 
     if (relativeMatch) {
       const value = Number.parseInt(relativeMatch[1], 10);
@@ -140,6 +144,8 @@ export function parseSerperDate(dateString?: string | null): Date | null {
           return subMonths(now, value);
         case "year":
           return subYears(now, value);
+        default:
+          return null;
       }
     }
 

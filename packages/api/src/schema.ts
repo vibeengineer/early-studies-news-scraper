@@ -152,7 +152,7 @@ export const HeadlinesFetchResponseSchema = z.object({
 });
 
 // --- Error Schema ---
-const ErrorDetailSchema = z.union([z.string(), z.record(z.unknown())]);
+const ErrorDetailSchema = z.union([z.string(), z.unknown()]);
 
 export const StandardErrorSchema = z.object({
   message: z.string(),
@@ -163,7 +163,7 @@ export const StandardErrorSchema = z.object({
 // Generic function to create the standard response schema
 export function createStandardResponseSchema<T extends ZodTypeAny>(
   dataSchema: T,
-  refName?: string
+  _refName?: string
 ) {
   const schema = z.object({
     data: dataSchema.nullable(),

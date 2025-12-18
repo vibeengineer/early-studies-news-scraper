@@ -8,10 +8,10 @@ declare global {
   /**
    * Variables available in Hono context
    */
-  interface Variables {
+  type Variables = {
     requestId: string;
     logger: Logger;
-  }
+  };
 }
 
 /**

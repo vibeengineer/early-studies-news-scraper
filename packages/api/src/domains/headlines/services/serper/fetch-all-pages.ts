@@ -84,7 +84,7 @@ export async function fetchAllPagesForUrl(
         pageLogger
       );
 
-      queriesMade++;
+      queriesMade += 1;
       totalCredits += pageResult.credits;
 
       const newsCount = pageResult.news?.length ?? 0;
@@ -116,7 +116,7 @@ export async function fetchAllPagesForUrl(
         for (const item of pageResult.news) {
           const itemUrl = item.link;
           if (seenUrls.has(itemUrl)) {
-            duplicatesOnPage++;
+            duplicatesOnPage += 1;
           } else {
             seenUrls.add(itemUrl);
             newResults.push(item);
@@ -159,7 +159,7 @@ export async function fetchAllPagesForUrl(
         }
       }
 
-      currentPage++;
+      currentPage += 1;
     } catch (error: unknown) {
       pageLogger.error(
         { err: error },

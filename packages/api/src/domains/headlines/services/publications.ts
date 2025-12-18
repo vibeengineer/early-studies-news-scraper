@@ -1,13 +1,13 @@
 import { and, eq } from "drizzle-orm";
 import { createDb } from "../../lib/db";
 
-export async function getPublications(
+export function getPublications(
   { database }: { database: string },
   filters?: { category?: string; region?: string }
 ) {
   const db = createDb(database);
 
-  const conditions = [];
+  const conditions: Array<Parameters<typeof and>[0]> = [];
   if (filters?.category) {
     conditions.push(
       eq(db.schema.headlinesPublications.category, filters.category)

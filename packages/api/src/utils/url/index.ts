@@ -2,6 +2,9 @@
  * URL utility functions for consistent URL handling across the application
  */
 
+// Regex constant for protocol removal
+const PROTOCOL_REGEX = /^https?:\/\//;
+
 /**
  * Normalizes a URL string by ensuring it has or doesn't have a protocol prefix
  * @param url The URL to normalize
@@ -10,7 +13,7 @@
  */
 export function normalizeUrl(url: string, includeProtocol = true): string {
   // First remove any existing protocol
-  const withoutProtocol = url.replace(/^https?:\/\//, "");
+  const withoutProtocol = url.replace(PROTOCOL_REGEX, "");
 
   // Then add protocol if requested
   return includeProtocol ? `https://${withoutProtocol}` : withoutProtocol;
