@@ -7,7 +7,7 @@ export function getPublications(
 ) {
   const db = createDb(database);
 
-  const conditions: Array<Parameters<typeof and>[0]> = [];
+  const conditions: Parameters<typeof and>[0][] = [];
   if (filters?.category) {
     conditions.push(
       eq(db.schema.headlinesPublications.category, filters.category)

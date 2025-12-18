@@ -7,17 +7,26 @@ import type {
 } from "../../../schema";
 import { config } from "./config";
 
+type FetchSerperPageOptions = {
+  siteQuery: string;
+  tbs: string;
+  geoParams: GeoParams;
+  apiKey: string;
+  page: number;
+  logger: Logger;
+};
+
 /**
  * Fetches a single page of news results from the Serper API for a given site query
  */
-export async function fetchSerperPage(
-  siteQuery: string,
-  tbs: string,
-  geoParams: GeoParams,
-  apiKey: string,
-  page: number,
-  logger: Logger
-): Promise<SerperNewsResult> {
+export async function fetchSerperPage({
+  siteQuery,
+  tbs,
+  geoParams,
+  apiKey,
+  page,
+  logger,
+}: FetchSerperPageOptions): Promise<SerperNewsResult> {
   const headers = new Headers({
     "X-API-KEY": apiKey,
     "Content-Type": "application/json",

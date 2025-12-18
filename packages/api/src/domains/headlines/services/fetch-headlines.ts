@@ -31,15 +31,15 @@ export async function fetchHeadlines(
   // Fetch headlines from all publication URLs in parallel
   const fetchPromises = publicationUrls.map((url) =>
     fetchLimit(() =>
-      fetchAllPagesForUrl(
+      fetchAllPagesForUrl({
         url,
         tbs,
         geoParams,
-        serperApiKey,
-        maxQueriesPerPublication,
+        apiKey: serperApiKey,
+        maxQueriesForThisUrl: maxQueriesPerPublication,
         // TODO: Add logger
-        console
-      )
+        logger: console,
+      })
     )
   );
 

@@ -10,7 +10,7 @@ export function handleDatabaseError(
     Variables: { logger: Logger; requestId: string };
     Bindings: Env;
   }>,
-  error: unknown,
+  error: Error,
   defaultMessage = "Database operation failed"
 ): Response {
   const logger = c.get("logger");

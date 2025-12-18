@@ -2,7 +2,6 @@ import { Hono } from "hono";
 import { HTTPException } from "hono/http-exception";
 import type { StatusCode } from "hono/utils/http-status";
 import { ZodError, type z } from "zod";
-
 import crmRouter from "../domains/crm/routes";
 import headlinesRouter from "../domains/headlines/routes";
 import surveysRouter from "../domains/surveys/routes";
@@ -108,6 +107,3 @@ export function createAppRouter() {
 
   return app;
 }
-
-// Export domain routers for direct access
-export { headlinesRouter, surveysRouter, crmRouter };

@@ -152,7 +152,7 @@ export const HeadlinesFetchResponseSchema = z.object({
 });
 
 // --- Error Schema ---
-const ErrorDetailSchema = z.union([z.string(), z.unknown()]);
+const ErrorDetailSchema = z.union([z.string(), z.record(z.any())]);
 
 export const StandardErrorSchema = z.object({
   message: z.string(),

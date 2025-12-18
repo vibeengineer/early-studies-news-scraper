@@ -15,7 +15,8 @@ const fetchSchema = z.object({
 export async function fetchHeadlinesHandler(
   c: Context<AuthenticatedAppContext>
 ) {
-  const body = await c.req.json().then((body) => fetchSchema.parse(body));
+  const jsonData = await c.req.json();
+  const body = fetchSchema.parse(jsonData);
   const result = await fetchHeadlines(
     { serperApiKey: c.env.SERPER_API_KEY },
     body
