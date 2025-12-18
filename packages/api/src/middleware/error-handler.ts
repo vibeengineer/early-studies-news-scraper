@@ -91,7 +91,7 @@ export function validateAndParseDateRange(
     Bindings: Env;
   }>,
   body: { startDate?: string; endDate?: string }
-): { startDate: Date | undefined; endDate: Date | undefined } | null {
+): { startDate: Date | null; endDate: Date | null } | null {
   const logger = c.get("logger");
   const startDate = parseDdMmYyyy(body.startDate);
   const endDate = parseDdMmYyyy(body.endDate);

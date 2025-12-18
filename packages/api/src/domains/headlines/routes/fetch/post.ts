@@ -1,7 +1,7 @@
 import type { Context } from "hono";
 import { z } from "zod";
 import type { AuthenticatedAppContext } from "@/types";
-import { fetchHeadlines } from "../services/fetch-headlines";
+import { fetchHeadlines } from "../../services/fetch-headlines";
 
 const fetchSchema = z.object({
   startDate: z.string(),

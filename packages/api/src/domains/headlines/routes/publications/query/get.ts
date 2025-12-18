@@ -1,10 +1,11 @@
+import { publicationCategories } from "@early-studies/db/schema";
 import type { Context } from "hono";
 import { z } from "zod";
 import type { AuthenticatedAppContext } from "@/types";
 import { getPublications } from "../../../services/publications";
 
 const querySchema = z.object({
-  category: z.string().optional(),
+  category: z.enum(publicationCategories).optional(),
   region: z.string().optional(),
 });
 

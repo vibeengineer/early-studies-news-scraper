@@ -1,10 +1,13 @@
-import { headlinesPublications } from "@early-studies/db/schema";
+import {
+  headlinesPublications,
+  type PublicationCategory,
+} from "@early-studies/db/schema";
 import { and, eq } from "drizzle-orm";
 import { createDb } from "@/lib/db";
 
-export function getPublications(
+export async function getPublications(
   { database }: { database: string },
-  filters?: { category?: string; region?: string }
+  filters?: { category?: PublicationCategory; region?: string }
 ) {
   const db = createDb(database);
 
@@ -16,14 +19,20 @@ export function getPublications(
     conditions.push(eq(headlinesPublications.region, filters.region));
   }
 
-  return db.query.headlinesPublications.findMany({
-    where: conditions.length ? and(...conditions) : undefined,
-  });
+  return await db
+    .select()
+    .from(headlinesPublications)
+    .where(conditions.length ? and(...conditions) : undefined);
 }
 
 export async function insertPublication(
   { database }: { database: string },
-  data: { name: string; url: string; category?: string; region?: string }
+  data: {
+    name: string;
+    url: string;
+    category?: PublicationCategory;
+    region?: string;
+  }
 ) {
   const db = createDb(database);
 

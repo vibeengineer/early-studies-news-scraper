@@ -1,4 +1,5 @@
 import pLimit from "p-limit";
+import { logger } from "@/logger";
 import { parseSerperDate } from "@/utils/date/parsers";
 import { datesToTbsString, getGeoParams } from "@/utils/date/search-params";
 import { fetchAllPagesForUrl } from "./serper/fetch-all-pages";
@@ -37,8 +38,7 @@ export async function fetchHeadlines(
         geoParams,
         apiKey: serperApiKey,
         maxQueriesForThisUrl: maxQueriesPerPublication,
-        // TODO: Add logger
-        logger: console,
+        logger,
       })
     )
   );

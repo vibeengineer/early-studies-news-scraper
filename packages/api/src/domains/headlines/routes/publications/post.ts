@@ -1,3 +1,4 @@
+import { publicationCategories } from "@early-studies/db/schema";
 import type { Context } from "hono";
 import { z } from "zod";
 import type { AuthenticatedAppContext } from "@/types";
@@ -6,7 +7,7 @@ import { insertPublication } from "../../services/publications";
 const createSchema = z.object({
   name: z.string(),
   url: z.string(),
-  category: z.string().optional(),
+  category: z.enum(publicationCategories).optional(),
   region: z.string().optional(),
 });
 
