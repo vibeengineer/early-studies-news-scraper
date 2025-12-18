@@ -1,4 +1,4 @@
-import { Logger } from 'pino';
+import type { Logger } from "pino";
 
 /**
  * Validates an auth token against the expected token
@@ -17,7 +17,7 @@ export function validateToken(
 
   if (userToken !== expectedToken) {
     if (logger) {
-      logger.warn('Invalid token');
+      logger.warn("Invalid token");
     }
     return { missing: false, valid: false };
   }

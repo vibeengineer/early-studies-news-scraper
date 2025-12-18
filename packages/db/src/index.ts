@@ -1,18 +1,16 @@
 // Schema exports
-export * from './schema';
-
-// Zod exports
-export * from './zod';
-
-// Relations exports
-export { relations } from './relations';
 
 // Client exports
-export { createDbClient, type DbClient } from './client';
+export { createDbClient, type DbClient } from "./client";
+// Relations exports
+export { relations } from "./relations";
+export * from "./schema";
+// Zod exports
+export * from "./zod";
 
 // Type inference helpers
-import type { InferInsertModel, InferSelectModel } from 'drizzle-orm';
-import type { clients, responses, surveys } from './schema';
+import type { InferInsertModel, InferSelectModel } from "drizzle-orm";
+import type { clients, responses, surveys } from "./schema";
 
 // Select types (for reading from DB)
 export type Client = InferSelectModel<typeof clients>;

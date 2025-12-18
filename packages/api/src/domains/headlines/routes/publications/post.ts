@@ -1,7 +1,7 @@
-import { insertPublication } from '../../services/publications';
-import type { AuthenticatedAppContext } from '../../../types';
-import type { Context } from 'hono';
-import { z } from 'zod';
+import type { Context } from "hono";
+import { z } from "zod";
+import type { AuthenticatedAppContext } from "../../../types";
+import { insertPublication } from "../../services/publications";
 
 const createSchema = z.object({
   name: z.string(),
@@ -10,8 +10,13 @@ const createSchema = z.object({
   region: z.string().optional(),
 });
 
-export async function createPublicationHandler(c: Context<AuthenticatedAppContext>) {
-  const data = await c.req.json().then(data => createSchema.parse(data));
-  const publication = await insertPublication({ database: c.env.DATABASE_URL }, data);
+export async function createPublicationHandler(
+  c: Context<AuthenticatedAppContext>
+) {
+  const data = await c.req.json().then((data) => createSchema.parse(data));
+  const publication = await insertPublication(
+    { database: c.env.DATABASE_URL },
+    data
+  );
   return c.json({ success: true, data: { publication }, error: null }, 201);
 }

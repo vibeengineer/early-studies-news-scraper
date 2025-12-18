@@ -6,7 +6,7 @@
  * Converts DD/MM/YYYY format to MM/DD/YYYY format
  */
 function convertDateFormat(ddMmYyyyDate: string): string {
-  const [day, month, year] = ddMmYyyyDate.split('/');
+  const [day, month, year] = ddMmYyyyDate.split("/");
   return `${month}/${day}/${year}`;
 }
 
@@ -25,26 +25,29 @@ export function datesToTbsString(startDate: string, endDate: string): string {
  * Gets the appropriate TBS (time-based search) string based on the date range option
  * or uses a custom TBS string if provided
  */
-export function getTbsString(dateRangeOption: string, customTbs?: string): string {
+export function getTbsString(
+  dateRangeOption: string,
+  customTbs?: string
+): string {
   if (customTbs) {
     return customTbs;
   }
 
   // Convert common date range options to TBS strings
   switch (dateRangeOption) {
-    case 'Past Hour':
-      return 'qdr:h';
-    case 'Past 24 Hours':
-      return 'qdr:d';
-    case 'Past Week':
-      return 'qdr:w';
-    case 'Past Month':
-      return 'qdr:m';
-    case 'Past Year':
-      return 'qdr:y';
+    case "Past Hour":
+      return "qdr:h";
+    case "Past 24 Hours":
+      return "qdr:d";
+    case "Past Week":
+      return "qdr:w";
+    case "Past Month":
+      return "qdr:m";
+    case "Past Year":
+      return "qdr:y";
     default:
       // If it doesn't match any predefined option, default to past week
-      return 'qdr:w';
+      return "qdr:w";
   }
 }
 
@@ -53,11 +56,11 @@ export function getTbsString(dateRangeOption: string, customTbs?: string): strin
  */
 export function getGeoParams(region: string): { gl: string; location: string } {
   switch (region) {
-    case 'US':
-      return { gl: 'us', location: 'United States' };
-    case 'UK':
-      return { gl: 'gb', location: 'United Kingdom' };
+    case "US":
+      return { gl: "us", location: "United States" };
+    case "UK":
+      return { gl: "gb", location: "United Kingdom" };
     default:
-      return { gl: 'us', location: 'United States' };
+      return { gl: "us", location: "United States" };
   }
 }

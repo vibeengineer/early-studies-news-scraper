@@ -1,4 +1,4 @@
-import { createAppRouter } from './routes';
+import { createAppRouter } from "./routes";
 
 /**
  * Main application export for Cloudflare Workers

@@ -1,15 +1,15 @@
-import { nanoid } from 'nanoid';
-import pino from 'pino';
-import type { Logger } from 'pino';
+import { nanoid } from "nanoid";
+import type { Logger } from "pino";
+import pino from "pino";
 
 /** Determines the log level based on environment bindings. */
 const getLogLevel = (env: Env) =>
-  env.LOG_LEVEL || (env.NODE_ENV === 'production' ? 'info' : 'debug');
+  env.LOG_LEVEL || (env.NODE_ENV === "production" ? "info" : "debug");
 
 /** Pino logger options optimized for Cloudflare Workers or development. */
 const getLoggerOptions = (env: Env): pino.LoggerOptions => {
   const logLevel = getLogLevel(env);
-  const isProduction = env.NODE_ENV === 'production';
+  const isProduction = env.NODE_ENV === "production";
 
   if (isProduction) {
     // Production: Use JSON logging suitable for Cloudflare
@@ -33,11 +33,11 @@ const getLoggerOptions = (env: Env): pino.LoggerOptions => {
   return {
     level: logLevel,
     transport: {
-      target: 'pino-pretty',
+      target: "pino-pretty",
       options: {
         colorize: true,
-        translateTime: 'SYS:standard', // Use system time, format: yyyy-mm-dd HH:MM:ss.l o
-        ignore: 'pid,hostname', // Ignore these common fields for cleaner dev logs
+        translateTime: "SYS:standard", // Use system time, format: yyyy-mm-dd HH:MM:ss.l o
+        ignore: "pid,hostname", // Ignore these common fields for cleaner dev logs
         levelFirst: true, // Show level first
         singleLine: true, // Try to keep logs on a single line
       },
@@ -51,7 +51,7 @@ const getLoggerOptions = (env: Env): pino.LoggerOptions => {
 export function createLogger(env: Env): Logger {
   const logger = pino(getLoggerOptions(env));
   logger.info(
-    `Logger initialized (level: ${getLogLevel(env)}, env: ${env.NODE_ENV || 'development'})`
+    `Logger initialized (level: ${getLogLevel(env)}, env: ${env.NODE_ENV || "development"})`
   );
   return logger;
 }
@@ -62,7 +62,10 @@ export function createLogger(env: Env): Logger {
  * @param requestId - Optional request ID. If not provided, a new one will be generated.
  * @returns A child logger with request context
  */
-export function createRequestLogger(logger: Logger, requestId?: string): Logger {
+export function createRequestLogger(
+  logger: Logger,
+  requestId?: string
+): Logger {
   const id = requestId || nanoid();
   return logger.child({ requestId: id });
 }

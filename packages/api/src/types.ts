@@ -1,4 +1,4 @@
-import { Logger } from 'pino';
+import type { Logger } from "pino";
 
 /**
  * Global variables and types used in the application

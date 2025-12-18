@@ -1,4 +1,4 @@
-import { z } from 'zod';
+import { z } from "zod";
 
 // Success response schema - always includes all three keys
 export function createSuccessSchema<T extends z.ZodTypeAny>(dataSchema: T) {

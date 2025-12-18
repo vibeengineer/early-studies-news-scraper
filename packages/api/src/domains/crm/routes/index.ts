@@ -1,4 +1,4 @@
-import { Hono } from 'hono';
+import { Hono } from "hono";
 
 // Create a router for the crm domain
 const crmRouter = new Hono<{ Variables: Variables; Bindings: Env }>();

@@ -1,5 +1,5 @@
-import { defineRelations } from 'drizzle-orm';
-import { clients, responses, surveys } from './schema';
+import { defineRelations } from "drizzle-orm";
+import { clients, responses, surveys } from "./schema";
 
 export const relations = defineRelations(
   {

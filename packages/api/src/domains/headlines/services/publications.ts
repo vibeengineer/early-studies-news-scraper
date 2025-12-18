@@ -1,5 +1,5 @@
-import { and, eq } from 'drizzle-orm';
-import { createDb } from '../../lib/db';
+import { and, eq } from "drizzle-orm";
+import { createDb } from "../../lib/db";
 
 export async function getPublications(
   { database }: { database: string },
@@ -9,7 +9,9 @@ export async function getPublications(
 
   const conditions = [];
   if (filters?.category) {
-    conditions.push(eq(db.schema.headlinesPublications.category, filters.category));
+    conditions.push(
+      eq(db.schema.headlinesPublications.category, filters.category)
+    );
   }
   if (filters?.region) {
     conditions.push(eq(db.schema.headlinesPublications.region, filters.region));
@@ -26,11 +28,17 @@ export async function insertPublication(
 ) {
   const db = createDb(database);
 
-  const [result] = await db.insert(db.schema.headlinesPublications).values(data).returning();
+  const [result] = await db
+    .insert(db.schema.headlinesPublications)
+    .values(data)
+    .returning();
   return result;
 }
 
-export async function deletePublication({ database }: { database: string }, id: string) {
+export async function deletePublication(
+  { database }: { database: string },
+  id: string
+) {
   const db = createDb(database);
 
   const [deleted] = await db

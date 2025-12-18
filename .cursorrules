@@ -1,0 +1,119 @@
+# AGENTS.md
+
+Agent instructions for the Early Studies monorepo.
+
+## Project Overview
+
+News headlines fetching and survey platform for Early Studies. This platform handles news scraping via Serper API, survey management, and CRM functionality.
+
+**Tech Stack:** Hono API on Cloudflare Workers, Drizzle ORM with PostgreSQL, Serper API for news scraping.
+
+## Setup Commands
+
+```bash
+pnpm install          # Install dependencies
+pnpm fix              # Format code and fix lint issues with Ultracite/Biome
+pnpm check            # Check for lint errors (no fixes)
+pnpm dev              # Start API dev server
+pnpm build            # Build all packages
+```
+
+## Database Commands
+
+```bash
+pnpm db:generate  # Generate migrations from schema changes
+pnpm db:migrate   # Apply migrations
+pnpm db:studio    # Open Drizzle Studio
+pnpm db:push      # Push schema to database
+```
+
+## Package Structure
+
+```
+packages/
+  api/      # @early-studies/api - Hono API on Cloudflare Workers
+  db/       # @early-studies/db - Drizzle schema and migrations
+```
+
+## Code Style
+
+This project uses **Ultracite** (Biome-based) for formatting and linting. Code is auto-formatted on save and pre-commit.
+
+### TypeScript
+
+- Use `strict` mode with `strictNullChecks` enabled
+- Prefer `unknown` over `any`
+- Use const assertions (`as const`) for immutable values
+- Explicit types for function parameters and return values when they enhance clarity
+
+### JavaScript/TypeScript Patterns
+
+- Arrow functions for callbacks
+- `for...of` over `.forEach()` and indexed loops
+- Optional chaining (`?.`) and nullish coalescing (`??`)
+- Template literals over string concatenation
+- `const` by default, `let` only when needed, never `var`
+
+### Async Code
+
+- Always `await` promises in async functions
+- Use `async/await` over promise chains
+- Handle errors with try-catch blocks
+
+### Error Handling
+
+- Throw `Error` objects, not strings
+- Early returns over nested conditionals
+- Remove `console.log`, `debugger`, `alert` from production
+
+### Security
+
+- Validate user input
+- Use parameterized queries
+
+### Performance
+
+- Avoid spread in loop accumulators
+- Top-level regex literals
+- Specific imports over namespace imports
+- Avoid barrel files
+
+## Testing Instructions
+
+- Run tests before committing: `pnpm test`
+- Write assertions inside `it()` or `test()` blocks
+- Use async/await, not done callbacks
+- No `.only` or `.skip` in committed code
+
+## PR Instructions
+
+- Run `pnpm fix` and `pnpm check` before committing
+- Keep commits focused and descriptive
+
+## Domain Architecture
+
+The codebase is organized into three primary domains:
+
+1. **Headlines** - News scraping, publications management
+2. **Surveys** - Survey creation, response collection
+3. **CRM** - Client management
+
+## Database Patterns
+
+- All entities include `created_at` and `updated_at` timestamps
+- IDs use nanoid for URL-safe short identifiers
+- Foreign keys use cascading deletes where appropriate
+- Indexes on frequently queried fields
+- Table names prefixed by domain (headlines_, surveys_, crm_)
+
+## API Patterns
+
+- Routes organized by domain (headlines, surveys, crm)
+- Zod validation on all inputs
+- Consistent response format: `{ success, data, error }`
+
+## Environment Variables
+
+Required for operations:
+- `DATABASE_URL` - PostgreSQL connection string
+- `SERPER_API_KEY` - Serper API key for news scraping

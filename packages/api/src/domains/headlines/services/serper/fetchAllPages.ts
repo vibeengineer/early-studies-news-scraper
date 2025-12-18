@@ -1,8 +1,12 @@
-import pLimit from 'p-limit';
-import type { Logger } from 'pino';
-import type { FetchAllPagesResult, GeoParams, SerperNewsItem } from '../../../schema';
-import { fetchSerperPage } from './client';
-import { config } from './config';
+import pLimit from "p-limit";
+import type { Logger } from "pino";
+import type {
+  FetchAllPagesResult,
+  GeoParams,
+  SerperNewsItem,
+} from "../../../schema";
+import { fetchSerperPage } from "./client";
+import { config } from "./config";
 
 // Create a concurrency limiter for parallel processing of multiple publications
 export const publicationLimit = pLimit(config.concurrencyLimit);
@@ -34,7 +38,7 @@ export async function fetchAllPagesForUrl(
     // Extract hostname robustly
     siteQuery = `site:${new URL(url).hostname}`;
   } catch (e: unknown) {
-    urlLogger.error({ err: e }, 'Invalid URL format provided');
+    urlLogger.error({ err: e }, "Invalid URL format provided");
     return {
       url,
       queriesMade: 0,
@@ -45,7 +49,10 @@ export async function fetchAllPagesForUrl(
     };
   }
 
-  urlLogger.info({ maxQueries: maxQueriesForThisUrl }, 'Starting iterative fetch for URL');
+  urlLogger.info(
+    { maxQueries: maxQueriesForThisUrl },
+    "Starting iterative fetch for URL"
+  );
 
   let queriesMade = 0;
   let totalCredits = 0;
@@ -58,13 +65,16 @@ export async function fetchAllPagesForUrl(
   while (currentPage <= maxQueriesForThisUrl) {
     // 1. Check per-URL query limit
     if (queriesMade >= maxQueriesForThisUrl) {
-      urlLogger.info({ queriesMade }, 'Reached max queries limit for this URL. Stopping.');
+      urlLogger.info(
+        { queriesMade },
+        "Reached max queries limit for this URL. Stopping."
+      );
       break;
     }
 
     const pageLogger = urlLogger.child({ page: currentPage });
     try {
-      pageLogger.info('Fetching page (credit reserved)');
+      pageLogger.info("Fetching page (credit reserved)");
       const pageResult = await fetchSerperPage(
         siteQuery,
         tbs,
@@ -87,7 +97,7 @@ export async function fetchAllPagesForUrl(
           siteQuery,
           totalResultsSoFar: aggregatedResults.length,
         },
-        'Page fetch successful.'
+        "Page fetch successful."
       );
 
       // Check stopping condition: no results
@@ -137,7 +147,7 @@ export async function fetchAllPagesForUrl(
             duplicatePercentage: duplicatePercentage.toFixed(1),
             totalUniqueResults: aggregatedResults.length,
           },
-          'Processed page results'
+          "Processed page results"
         );
 
         // Add safety check for maximum results per publication
@@ -153,7 +163,7 @@ export async function fetchAllPagesForUrl(
     } catch (error: unknown) {
       pageLogger.error(
         { err: error },
-        'Failed to fetch page after retries. Stopping fetch for this URL.'
+        "Failed to fetch page after retries. Stopping fetch for this URL."
       );
       return {
         url,
@@ -168,7 +178,13 @@ export async function fetchAllPagesForUrl(
 
   urlLogger.info(
     { queriesMade, totalResults: aggregatedResults.length, totalCredits },
-    'Finished fetching for URL.'
+    "Finished fetching for URL."
   );
-  return { url, queriesMade, credits: totalCredits, results: aggregatedResults, tbsParams: tbs };
+  return {
+    url,
+    queriesMade,
+    credits: totalCredits,
+    results: aggregatedResults,
+    tbsParams: tbs,
+  };
 }

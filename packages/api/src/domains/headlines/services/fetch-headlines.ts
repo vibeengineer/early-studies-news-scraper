@@ -1,7 +1,7 @@
-import pLimit from 'p-limit';
-import { fetchAllPagesForUrl } from './serper/fetchAllPages';
-import { parseSerperDate } from '../../utils/date/parsers';
-import { datesToTbsString, getGeoParams } from '../../utils/date/search-params';
+import pLimit from "p-limit";
+import { parseSerperDate } from "../../utils/date/parsers";
+import { datesToTbsString, getGeoParams } from "../../utils/date/search-params";
+import { fetchAllPagesForUrl } from "./serper/fetchAllPages";
 
 export async function fetchHeadlines(
   { database, serperApiKey }: { database: string; serperApiKey: string },
@@ -15,7 +15,7 @@ export async function fetchHeadlines(
   }: {
     startDate: string;
     endDate: string;
-    region: 'US' | 'UK';
+    region: "US" | "UK";
     publicationUrls: string[];
     maxQueriesPerPublication: number;
     flattenResults: boolean;
@@ -49,7 +49,7 @@ export async function fetchHeadlines(
   const results = rawResults.map((result) => {
     if (result.error) {
       return {
-        status: 'rejected' as const,
+        status: "rejected" as const,
         url: result.url,
         queriesMade: result.queriesMade,
         creditsConsumed: result.credits,
@@ -69,23 +69,25 @@ export async function fetchHeadlines(
           snippet: item.snippet ?? null,
           source: item.source,
           rawDate: item.date ?? null,
-          normalizedDate: parsedDate ? parsedDate.toLocaleDateString('en-GB') : undefined,
+          normalizedDate: parsedDate
+            ? parsedDate.toLocaleDateString("en-GB")
+            : undefined,
         };
       })
       .filter((item) => {
         // Apply date filtering with a 2-day buffer
         if (!item.normalizedDate) return false;
 
-        const parts = item.normalizedDate.split('/');
+        const parts = item.normalizedDate.split("/");
         if (parts.length !== 3) return false;
 
-        const day = parseInt(parts[0], 10);
-        const month = parseInt(parts[1], 10) - 1;
-        const year = parseInt(parts[2], 10);
+        const day = Number.parseInt(parts[0], 10);
+        const month = Number.parseInt(parts[1], 10) - 1;
+        const year = Number.parseInt(parts[2], 10);
         const itemDate = new Date(year, month, day);
 
-        const startParts = startDate.split('/').map(Number);
-        const endParts = endDate.split('/').map(Number);
+        const startParts = startDate.split("/").map(Number);
+        const endParts = endDate.split("/").map(Number);
 
         const bufferDays = 2;
         const startDateWithBuffer = new Date(
@@ -103,7 +105,7 @@ export async function fetchHeadlines(
       });
 
     return {
-      status: 'fulfilled' as const,
+      status: "fulfilled" as const,
       url: result.url,
       queriesMade: result.queriesMade,
       creditsConsumed: result.credits,
@@ -113,13 +115,20 @@ export async function fetchHeadlines(
 
   // Calculate summary
   const totalResults = results.reduce(
-    (acc, curr) => acc + (curr.status === 'fulfilled' ? curr.results.length : 0),
+    (acc, curr) =>
+      acc + (curr.status === "fulfilled" ? curr.results.length : 0),
     0
   );
-  const totalCreditsConsumed = results.reduce((acc, curr) => acc + curr.creditsConsumed, 0);
-  const totalQueriesMade = results.reduce((acc, curr) => acc + curr.queriesMade, 0);
-  const successCount = results.filter((r) => r.status === 'fulfilled').length;
-  const failureCount = results.filter((r) => r.status === 'rejected').length;
+  const totalCreditsConsumed = results.reduce(
+    (acc, curr) => acc + curr.creditsConsumed,
+    0
+  );
+  const totalQueriesMade = results.reduce(
+    (acc, curr) => acc + curr.queriesMade,
+    0
+  );
+  const successCount = results.filter((r) => r.status === "fulfilled").length;
+  const failureCount = results.filter((r) => r.status === "rejected").length;
 
   const summary = {
     totalResults,
@@ -131,7 +140,7 @@ export async function fetchHeadlines(
 
   // Handle flattenResults option
   const finalResults = flattenResults
-    ? results.flatMap((r) => (r.status === 'fulfilled' ? r.results : []))
+    ? results.flatMap((r) => (r.status === "fulfilled" ? r.results : []))
     : results;
 
   return {

@@ -1,5 +1,6 @@
-import { createSchemaFactory } from 'drizzle-zod';
+import { createSchemaFactory } from "drizzle-zod";
 
-export const { createSelectSchema, createInsertSchema, createUpdateSchema } = createSchemaFactory({
-  coerce: { date: true },
-});
+export const { createSelectSchema, createInsertSchema, createUpdateSchema } =
+  createSchemaFactory({
+    coerce: { date: true },
+  });

@@ -1,6 +1,6 @@
-import { headlinesPublications } from '@early-studies/db/schema';
-import { createSelectSchema } from '@early-studies/db/zod';
-import { z } from 'zod';
+import { headlinesPublications } from "@early-studies/db/schema";
+import { createSelectSchema } from "@early-studies/db/zod";
+import { z } from "zod";
 
 // Base schema from DB (for internal use)
 const publicationSelectSchemaBase = createSelectSchema(headlinesPublications);

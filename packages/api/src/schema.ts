@@ -1,25 +1,27 @@
-import { publicationCategories } from '@early-studies/db/schema';
-import { type ZodTypeAny, z } from 'zod';
+import { publicationCategories } from "@early-studies/db/schema";
+import { type ZodTypeAny, z } from "zod";
 
 // --- Base Schemas ---
 const PublicationUrlsSchema = z
-  .array(z.string().url({ message: 'Each publication URL must be a valid URL.' }))
-  .min(1, { message: 'At least one publication URL is required.' })
+  .array(
+    z.string().url({ message: "Each publication URL must be a valid URL." })
+  )
+  .min(1, { message: "At least one publication URL is required." })
   .default([
-    'https://bbc.co.uk',
-    'https://theguardian.com',
-    'https://telegraph.co.uk',
-    'https://thetimes.co.uk',
-    'https://ft.com',
-    'https://economist.com',
-    'https://independent.co.uk',
-    'https://thesun.co.uk',
-    'https://dailymail.co.uk',
-    'https://mirror.co.uk',
-    'https://express.co.uk',
-    'https://standard.co.uk',
-    'https://spectator.co.uk',
-    'https://newstatesman.com',
+    "https://bbc.co.uk",
+    "https://theguardian.com",
+    "https://telegraph.co.uk",
+    "https://thetimes.co.uk",
+    "https://ft.com",
+    "https://economist.com",
+    "https://independent.co.uk",
+    "https://thesun.co.uk",
+    "https://dailymail.co.uk",
+    "https://mirror.co.uk",
+    "https://express.co.uk",
+    "https://standard.co.uk",
+    "https://spectator.co.uk",
+    "https://newstatesman.com",
   ]);
 
 // --- Serper API Schemas ---
@@ -70,55 +72,69 @@ const BaseResponseSchema = z.object({
 });
 
 const FetchSuccessSchema = BaseResponseSchema.extend({
-  status: z.literal('fulfilled'),
+  status: z.literal("fulfilled"),
 });
 
 const FetchFailureSchema = BaseResponseSchema.extend({
-  status: z.literal('rejected'),
+  status: z.literal("rejected"),
   reason: z.string(),
 });
 
-const FetchResultSchema = z.discriminatedUnion('status', [FetchSuccessSchema, FetchFailureSchema]);
+const FetchResultSchema = z.discriminatedUnion("status", [
+  FetchSuccessSchema,
+  FetchFailureSchema,
+]);
 
 // --- Request Schemas ---
 const HeadlinesFetchRequestBaseSchema = z.object({
   publicationUrls: PublicationUrlsSchema,
-  region: z.enum(['US', 'UK']),
+  region: z.enum(["US", "UK"]),
   startDate: z
     .string()
-    .regex(/^\d{2}\/\d{2}\/\d{4}$/, { message: 'Start date must be in DD/MM/YYYY format' })
-    .describe('Start date in DD/MM/YYYY format'),
+    .regex(/^\d{2}\/\d{2}\/\d{4}$/, {
+      message: "Start date must be in DD/MM/YYYY format",
+    })
+    .describe("Start date in DD/MM/YYYY format"),
   endDate: z
     .string()
-    .regex(/^\d{2}\/\d{2}\/\d{4}$/, { message: 'End date must be in DD/MM/YYYY format' })
-    .describe('End date in DD/MM/YYYY format'),
+    .regex(/^\d{2}\/\d{2}\/\d{4}$/, {
+      message: "End date must be in DD/MM/YYYY format",
+    })
+    .describe("End date in DD/MM/YYYY format"),
   maxQueriesPerPublication: z
     .number()
     .int()
-    .positive('Max queries per publication must be a positive integer.')
+    .positive("Max queries per publication must be a positive integer.")
     .optional()
     .default(5),
   flattenResults: z
     .boolean()
     .optional()
     .default(true)
-    .describe('If true, returns a flat array of headlines. If false, groups by publication URL.'),
+    .describe(
+      "If true, returns a flat array of headlines. If false, groups by publication URL."
+    ),
 });
 
 // --- Hono Request Input Schema ---
-export const HeadlinesFetchRequestSchema = HeadlinesFetchRequestBaseSchema.refine(
-  (data) => {
-    const startParts = data.startDate.split('/').map(Number);
-    const endParts = data.endDate.split('/').map(Number);
-    const startDate = new Date(startParts[2], startParts[1] - 1, startParts[0]);
-    const endDate = new Date(endParts[2], endParts[1] - 1, endParts[0]);
-    return startDate <= endDate;
-  },
-  {
-    message: 'Start date must be before or equal to end date',
-    path: ['startDate'],
-  }
-);
+export const HeadlinesFetchRequestSchema =
+  HeadlinesFetchRequestBaseSchema.refine(
+    (data) => {
+      const startParts = data.startDate.split("/").map(Number);
+      const endParts = data.endDate.split("/").map(Number);
+      const startDate = new Date(
+        startParts[2],
+        startParts[1] - 1,
+        startParts[0]
+      );
+      const endDate = new Date(endParts[2], endParts[1] - 1, endParts[0]);
+      return startDate <= endDate;
+    },
+    {
+      message: "Start date must be before or equal to end date",
+      path: ["startDate"],
+    }
+  );
 
 // --- Response Schemas ---
 const HeadlinesFetchSummarySchema = z.object({
@@ -160,20 +176,9 @@ export function createStandardResponseSchema<T extends ZodTypeAny>(
 // --- Publications Schemas ---
 export const PublicationBaseSchema = z.object({
   id: z.string().optional(),
-  name: z
-    .string()
-    .min(1, { message: 'Name is required' })
-    ,
-  category: z
-    .enum(publicationCategories)
-    .optional()
-    .nullable()
-    ,
-  region: z
-    .string()
-    .optional()
-    .nullable()
-    ,
+  name: z.string().min(1, { message: "Name is required" }),
+  category: z.enum(publicationCategories).optional().nullable(),
+  region: z.string().optional().nullable(),
   createdAt: z.date().optional(),
   updatedAt: z.date().optional(),
 });
@@ -204,22 +209,26 @@ export const DeletePublicationBodySchema = z.object({
 // --- Response Schemas ---
 export const PublicationsListResponseSchema = createStandardResponseSchema(
   z.array(PublicationSchema),
-  'PublicationsListResponse'
+  "PublicationsListResponse"
 );
 
 export const SinglePublicationResponseSchema = createStandardResponseSchema(
   PublicationSchema,
-  'SinglePublicationResponse'
+  "SinglePublicationResponse"
 );
 
 export const HeadlinesFetchStdResponseSchema = createStandardResponseSchema(
   HeadlinesFetchResponseSchema,
-  'HeadlinesFetchResponse'
+  "HeadlinesFetchResponse"
 );
 
 // --- Derived Types ---
-export type HeadlinesFetchRequestInput = z.input<typeof HeadlinesFetchRequestSchema>;
-export type ValidatedHeadlinesFetchData = z.output<typeof HeadlinesFetchRequestSchema>;
+export type HeadlinesFetchRequestInput = z.input<
+  typeof HeadlinesFetchRequestSchema
+>;
+export type ValidatedHeadlinesFetchData = z.output<
+  typeof HeadlinesFetchRequestSchema
+>;
 export type SerperNewsItem = z.infer<typeof SerperNewsItemSchema>;
 export type SerperNewsResult = z.infer<typeof SerperNewsResultSchema>;
 export type FetchResult = z.infer<typeof FetchResultSchema>;

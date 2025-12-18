@@ -1,33 +1,41 @@
-import { Context, Next } from 'hono';
-import { StatusCode } from 'hono/utils/http-status';
-import { Logger } from 'pino';
-import { z } from 'zod';
-import { StandardErrorSchema } from '../schema';
-import { parseDdMmYyyy } from '../utils/date/parsers';
+import type { Context, Next } from "hono";
+import type { StatusCode } from "hono/utils/http-status";
+import type { Logger } from "pino";
+import type { z } from "zod";
+import type { StandardErrorSchema } from "../schema";
+import { parseDdMmYyyy } from "../utils/date/parsers";
 
 export function handleDatabaseError(
-  c: Context<{ Variables: { logger: Logger; requestId: string }; Bindings: Env }>,
+  c: Context<{
+    Variables: { logger: Logger; requestId: string };
+    Bindings: Env;
+  }>,
   error: unknown,
-  defaultMessage = 'Database operation failed'
+  defaultMessage = "Database operation failed"
 ): Response {
-  const logger = c.get('logger');
+  const logger = c.get("logger");
   let statusCode = 500;
-  let errorPayload: z.infer<typeof StandardErrorSchema> = { message: defaultMessage };
+  let errorPayload: z.infer<typeof StandardErrorSchema> = {
+    message: defaultMessage,
+  };
 
   if (error instanceof Error) {
-    logger.error({ err: error }, 'Database error');
-    errorPayload = { message: error.message || defaultMessage, code: 'DB_ERROR' };
+    logger.error({ err: error }, "Database error");
+    errorPayload = {
+      message: error.message || defaultMessage,
+      code: "DB_ERROR",
+    };
 
-    if (error.message.includes('already exists')) {
+    if (error.message.includes("already exists")) {
       statusCode = 409;
-      errorPayload.code = 'DB_CONFLICT';
-    } else if (error.message.includes('not found')) {
+      errorPayload.code = "DB_CONFLICT";
+    } else if (error.message.includes("not found")) {
       statusCode = 404;
-      errorPayload.code = 'DB_NOT_FOUND';
+      errorPayload.code = "DB_NOT_FOUND";
     }
   } else {
-    logger.error({ error }, 'Unexpected non-error thrown');
-    errorPayload = { message: defaultMessage, code: 'UNKNOWN_ERROR' };
+    logger.error({ error }, "Unexpected non-error thrown");
+    errorPayload = { message: defaultMessage, code: "UNKNOWN_ERROR" };
   }
 
   c.status(statusCode as StatusCode);
@@ -40,7 +48,10 @@ export function handleDatabaseError(
 
 export function validateNonEmptyBody() {
   return async (
-    c: Context<{ Variables: { logger: Logger; requestId: string }; Bindings: Env }>,
+    c: Context<{
+      Variables: { logger: Logger; requestId: string };
+      Bindings: Env;
+    }>,
     next: Next
   ) => {
     const body = await c.req.json().catch(() => ({}));
@@ -49,7 +60,10 @@ export function validateNonEmptyBody() {
       return c.json({
         data: null,
         success: false,
-        error: { message: 'Request body cannot be empty for update', code: 'VALIDATION_ERROR' },
+        error: {
+          message: "Request body cannot be empty for update",
+          code: "VALIDATION_ERROR",
+        },
       });
     }
 
@@ -72,31 +86,43 @@ export function createApiResponse<T>(
 }
 
 export function validateAndParseDateRange(
-  c: Context<{ Variables: { logger: Logger; requestId: string }; Bindings: Env }>,
+  c: Context<{
+    Variables: { logger: Logger; requestId: string };
+    Bindings: Env;
+  }>,
   body: { startDate?: string; endDate?: string }
 ): { startDate: Date | undefined; endDate: Date | undefined } | null {
-  const logger = c.get('logger');
+  const logger = c.get("logger");
   const startDate = parseDdMmYyyy(body.startDate);
   const endDate = parseDdMmYyyy(body.endDate);
 
   if (body.startDate && !startDate) {
-    logger.warn({ startDate: body.startDate }, 'Invalid start date format provided');
+    logger.warn(
+      { startDate: body.startDate },
+      "Invalid start date format provided"
+    );
     c.status(400);
     c.json({
       data: null,
       success: false,
-      error: { message: 'Invalid start date format. Use DD/MM/YYYY.', code: 'VALIDATION_ERROR' },
+      error: {
+        message: "Invalid start date format. Use DD/MM/YYYY.",
+        code: "VALIDATION_ERROR",
+      },
     });
     return null;
   }
 
   if (body.endDate && !endDate) {
-    logger.warn({ endDate: body.endDate }, 'Invalid end date format provided');
+    logger.warn({ endDate: body.endDate }, "Invalid end date format provided");
     c.status(400);
     c.json({
       data: null,
       success: false,
-      error: { message: 'Invalid end date format. Use DD/MM/YYYY.', code: 'VALIDATION_ERROR' },
+      error: {
+        message: "Invalid end date format. Use DD/MM/YYYY.",
+        code: "VALIDATION_ERROR",
+      },
     });
     return null;
   }
@@ -104,13 +130,16 @@ export function validateAndParseDateRange(
   if (startDate && endDate && startDate > endDate) {
     logger.warn(
       { startDate: body.startDate, endDate: body.endDate },
-      'Start date cannot be after end date'
+      "Start date cannot be after end date"
     );
     c.status(400);
     c.json({
       data: null,
       success: false,
-      error: { message: 'Start date cannot be after end date.', code: 'VALIDATION_ERROR' },
+      error: {
+        message: "Start date cannot be after end date.",
+        code: "VALIDATION_ERROR",
+      },
     });
     return null;
   }
