@@ -1,6 +1,6 @@
 import type { Context } from "hono";
 import { z } from "zod";
-import type { AuthenticatedAppContext } from "../../../../types";
+import type { AuthenticatedAppContext } from "@/types";
 import { deletePublication } from "../../../services/publications";
 
 const deleteSchema = z.object({

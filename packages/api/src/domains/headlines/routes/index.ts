@@ -1,5 +1,5 @@
 import { Hono } from "hono";
-import { authMiddleware } from "../../middleware/auth";
+import { authMiddleware } from "@/middleware/auth";
 import { fetchHeadlinesHandler } from "./fetch/post";
 // Route handlers
 import { deletePublicationHandler } from "./publications/by-id/delete";

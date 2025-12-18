@@ -1,10 +1,6 @@
 import retry from "async-retry";
 import type { Logger } from "pino";
-import type {
-  GeoParams,
-  SerperAccountDetails,
-  SerperNewsResult,
-} from "../../../schema";
+import type { GeoParams, SerperAccountDetails, SerperNewsResult } from "@/schema";
 import { config } from "./config";
 
 type FetchSerperPageOptions = {

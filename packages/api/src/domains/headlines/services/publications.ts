@@ -1,5 +1,6 @@
+import { headlinesPublications } from "@early-studies/db/schema";
 import { and, eq } from "drizzle-orm";
-import { createDb } from "../../lib/db";
+import { createDb } from "@/lib/db";
 
 export function getPublications(
   { database }: { database: string },
@@ -9,12 +10,10 @@ export function getPublications(
 
   const conditions: Parameters<typeof and>[0][] = [];
   if (filters?.category) {
-    conditions.push(
-      eq(db.schema.headlinesPublications.category, filters.category)
-    );
+    conditions.push(eq(headlinesPublications.category, filters.category));
   }
   if (filters?.region) {
-    conditions.push(eq(db.schema.headlinesPublications.region, filters.region));
+    conditions.push(eq(headlinesPublications.region, filters.region));
   }
 
   return db.query.headlinesPublications.findMany({
@@ -29,7 +28,7 @@ export async function insertPublication(
   const db = createDb(database);
 
   const [result] = await db
-    .insert(db.schema.headlinesPublications)
+    .insert(headlinesPublications)
     .values(data)
     .returning();
   return result;
@@ -42,8 +41,8 @@ export async function deletePublication(
   const db = createDb(database);
 
   const [deleted] = await db
-    .delete(db.schema.headlinesPublications)
-    .where(eq(db.schema.headlinesPublications.id, id))
+    .delete(headlinesPublications)
+    .where(eq(headlinesPublications.id, id))
     .returning();
   return deleted ?? null;
 }

@@ -59,12 +59,12 @@ export function parseDdMmYyyy(dateString?: string): Date | null {
   try {
     const parsed = parse(dateString, "dd/MM/yyyy", new Date());
     if (Number.isNaN(parsed.getTime())) {
-      return;
+      return null;
     }
     return parsed;
   } catch (e) {
     console.error(`Failed to parse date string: ${dateString}`, e);
-    return;
+    return null;
   }
 }
 

@@ -1,6 +1,6 @@
 import pLimit from "p-limit";
-import { parseSerperDate } from "../../utils/date/parsers";
-import { datesToTbsString, getGeoParams } from "../../utils/date/search-params";
+import { parseSerperDate } from "@/utils/date/parsers";
+import { datesToTbsString, getGeoParams } from "@/utils/date/search-params";
 import { fetchAllPagesForUrl } from "./serper/fetch-all-pages";
 
 export async function fetchHeadlines(

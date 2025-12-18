@@ -5,7 +5,7 @@ import type {
   GeoParams,
   SerperNewsItem,
   SerperNewsResult,
-} from "../../../schema";
+} from "@/schema";
 import { fetchSerperPage } from "./client";
 import { config } from "./config";
 

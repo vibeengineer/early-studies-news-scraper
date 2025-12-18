@@ -2,8 +2,8 @@ import type { Context, Next } from "hono";
 import type { StatusCode } from "hono/utils/http-status";
 import type { Logger } from "pino";
 import type { z } from "zod";
-import type { StandardErrorSchema } from "../schema";
-import { parseDdMmYyyy } from "../utils/date/parsers";
+import type { StandardErrorSchema } from "@/schema";
+import { parseDdMmYyyy } from "@/utils/date/parsers";
 
 export function handleDatabaseError(
   c: Context<{
