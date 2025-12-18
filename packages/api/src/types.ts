@@ -15,6 +15,24 @@ declare global {
 }
 
 /**
+ * Context variables available in handlers
+ */
+export type AppVariables = Variables;
+
+/**
+ * Full app context type for Hono
+ */
+export type AppContext = {
+  Bindings: Env;
+  Variables: AppVariables;
+};
+
+/**
+ * Context for routes behind authMiddleware - user is guaranteed authenticated
+ */
+export type AuthenticatedAppContext = AppContext;
+
+/**
  * Workflow parameters for processing a news item
  */
 export type ProcessNewsItemParams = {

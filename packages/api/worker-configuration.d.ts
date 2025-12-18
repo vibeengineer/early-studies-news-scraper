@@ -3,17 +3,11 @@
 declare namespace Cloudflare {
 	interface Env {
 		DEFAULT_REGION: "UK";
-		SYNC_ENABLED: "true";
-		SYNC_FREQUENCY: "daily";
 		BEARER_TOKEN: string;
 		SERPER_API_KEY: string;
 		NODE_ENV: string;
 		LOG_LEVEL: string;
-		GOOGLE_AI_STUDIO_API_KEY: string;
-		DB: D1Database;
-		NEWS_ITEM_QUEUE: Queue;
-		AI: Ai;
-		PROCESS_NEWS_ITEM_WORKFLOW: Workflow;
+		DATABASE_URL: string;
 	}
 }
 interface Env extends Cloudflare.Env {}
@@ -21,7 +15,7 @@ type StringifyValues<EnvType extends Record<string, unknown>> = {
 	[Binding in keyof EnvType]: EnvType[Binding] extends string ? EnvType[Binding] : string;
 };
 declare namespace NodeJS {
-	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "DEFAULT_REGION" | "SYNC_ENABLED" | "SYNC_FREQUENCY" | "BEARER_TOKEN" | "SERPER_API_KEY" | "NODE_ENV" | "LOG_LEVEL" | "GOOGLE_AI_STUDIO_API_KEY">> {}
+	interface ProcessEnv extends StringifyValues<Pick<Cloudflare.Env, "DEFAULT_REGION" | "BEARER_TOKEN" | "SERPER_API_KEY" | "NODE_ENV" | "LOG_LEVEL" | "DATABASE_URL">> {}
 }
 
 // Begin runtime types

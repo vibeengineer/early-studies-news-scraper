@@ -3,51 +3,11 @@
   "main": "src/index.ts",
   "compatibility_date": "2025-04-04",
   "compatibility_flags": ["nodejs_compat"],
-  "d1_databases": [
-    {
-      "binding": "DB",
-      "database_name": "early-studies-d1-database",
-      "database_id": "770fd9ff-f7fa-40bc-9a83-b6036ddff67e",
-      "migrations_dir": "src/db/migrations"
-    }
-  ],
   "observability": {
     "enabled": true,
     "head_sampling_rate": 1
   },
-  "workflows": [
-    {
-      "name": "process-news-item-workflow",
-      "binding": "PROCESS_NEWS_ITEM_WORKFLOW",
-      "class_name": "ProcessNewsItemWorkflow"
-    }
-  ],
-  "queues": {
-    "producers": [
-      {
-        "queue": "news-item-queue",
-        "binding": "NEWS_ITEM_QUEUE"
-      }
-    ],
-    "consumers": [
-      {
-        "queue": "news-item-queue",
-        "dead_letter_queue": "news-item-dlq",
-        "max_batch_size": 10,
-        "max_batch_timeout": 1,
-        "max_retries": 3
-      }
-    ]
-  },
-  "ai": {
-    "binding": "AI"
-  },
-  "triggers": {
-    "crons": ["0 0 * * *", "0 0 */2 * *", "0 0 * * 1", "0 0 1,15 * *", "0 0 1 * *"]
-  },
   "vars": {
-    "DEFAULT_REGION": "UK",
-    "SYNC_ENABLED": "true",
-    "SYNC_FREQUENCY": "daily"
+    "DEFAULT_REGION": "UK"
   }
 }

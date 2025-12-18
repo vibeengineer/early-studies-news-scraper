@@ -2,20 +2,34 @@
   "name": "early-studies",
   "private": true,
   "type": "module",
+  "packageManager": "pnpm@9.14.4",
+  "engines": {
+    "node": ">=22.0.0"
+  },
   "scripts": {
     "build": "pnpm -r build",
     "dev": "pnpm --filter @early-studies/api dev",
     "lint": "biome lint .",
     "format": "biome format --write .",
     "check": "biome check --apply .",
-    "test": "pnpm -r test"
+    "test": "pnpm -r test",
+    "db:generate": "pnpm --filter @early-studies/db db:generate",
+    "db:migrate": "pnpm --filter @early-studies/db db:migrate",
+    "db:push": "pnpm --filter @early-studies/db db:push",
+    "db:studio": "pnpm --filter @early-studies/db db:studio"
+  },
+  "dependencies": {
+    "zod": "^4.0.0"
   },
   "devDependencies": {
-    "@biomejs/biome": "1.5.3",
-    "typescript": "^5.5.2"
+    "@biomejs/biome": "2.3.8",
+    "@total-typescript/ts-reset": "^0.6.1",
+    "@types/node": "22",
+    "typescript": "^5.7.2"
   },
-  "packageManager": "pnpm@10.11.0",
-  "engines": {
-    "node": ">=20"
+  "pnpm": {
+    "overrides": {
+      "drizzle-orm": "^1.0.0-beta.2"
+    }
   }
 }

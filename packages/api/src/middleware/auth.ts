@@ -19,7 +19,7 @@ export function createAuthMiddleware() {
       const code = missing ? 'AUTH_MISSING_TOKEN' : 'AUTH_INVALID_TOKEN';
       const message = missing ? 'Authorization token is missing' : 'Authorization token is invalid';
 
-      logger.warn('Authentication failed', { message, status });
+      logger.warn({ message, status }, 'Authentication failed');
 
       return c.json(
         {

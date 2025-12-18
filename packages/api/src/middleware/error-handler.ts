@@ -2,7 +2,6 @@ import { Context, Next } from 'hono';
 import { StatusCode } from 'hono/utils/http-status';
 import { Logger } from 'pino';
 import { z } from 'zod';
-import { DatabaseError } from '../db/queries';
 import { StandardErrorSchema } from '../schema';
 import { parseDdMmYyyy } from '../utils/date/parsers';
 
@@ -15,32 +14,19 @@ export function handleDatabaseError(
   let statusCode = 500;
   let errorPayload: z.infer<typeof StandardErrorSchema> = { message: defaultMessage };
 
-  if (error instanceof Error && error.name === 'DatabaseError') {
-    const dbError = error as DatabaseError;
-    logger.error('Database error', { message: dbError.message, details: dbError.details });
+  if (error instanceof Error) {
+    logger.error({ err: error }, 'Database error');
+    errorPayload = { message: error.message || defaultMessage, code: 'DB_ERROR' };
 
-    errorPayload = {
-      message: dbError.message,
-      code: 'DB_OPERATION_FAILED',
-      details: dbError.details ?? undefined,
-    };
-
-    if (dbError.message.includes('already exists')) {
+    if (error.message.includes('already exists')) {
       statusCode = 409;
       errorPayload.code = 'DB_CONFLICT';
-    } else if (dbError.message.includes('not found')) {
+    } else if (error.message.includes('not found')) {
       statusCode = 404;
       errorPayload.code = 'DB_NOT_FOUND';
     }
-  } else if (error instanceof Error) {
-    logger.error('Unexpected application error', {
-      errorName: error.name,
-      errorMessage: error.message,
-      errorStack: error.stack,
-    });
-    errorPayload = { message: error.message || defaultMessage, code: 'UNEXPECTED_ERROR' };
   } else {
-    logger.error('Unexpected non-error thrown', { error });
+    logger.error({ error }, 'Unexpected non-error thrown');
     errorPayload = { message: defaultMessage, code: 'UNKNOWN_ERROR' };
   }
 
@@ -94,7 +80,7 @@ export function validateAndParseDateRange(
   const endDate = parseDdMmYyyy(body.endDate);
 
   if (body.startDate && !startDate) {
-    logger.warn('Invalid start date format provided:', { startDate: body.startDate });
+    logger.warn({ startDate: body.startDate }, 'Invalid start date format provided');
     c.status(400);
     c.json({
       data: null,
@@ -105,7 +91,7 @@ export function validateAndParseDateRange(
   }
 
   if (body.endDate && !endDate) {
-    logger.warn('Invalid end date format provided:', { endDate: body.endDate });
+    logger.warn({ endDate: body.endDate }, 'Invalid end date format provided');
     c.status(400);
     c.json({
       data: null,
@@ -116,10 +102,10 @@ export function validateAndParseDateRange(
   }
 
   if (startDate && endDate && startDate > endDate) {
-    logger.warn('Start date cannot be after end date', {
-      startDate: body.startDate,
-      endDate: body.endDate,
-    });
+    logger.warn(
+      { startDate: body.startDate, endDate: body.endDate },
+      'Start date cannot be after end date'
+    );
     c.status(400);
     c.json({
       data: null,

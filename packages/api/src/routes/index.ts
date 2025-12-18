@@ -1,20 +1,13 @@
-import { apiReference } from '@scalar/hono-api-reference';
 import { Hono } from 'hono';
-import { openAPISpecs } from 'hono-openapi';
 import { HTTPException } from 'hono/http-exception';
 import { StatusCode } from 'hono/utils/http-status';
 import { ZodError, z } from 'zod';
 
+import crmRouter from '../domains/crm/routes';
+import headlinesRouter from '../domains/headlines/routes';
+import surveysRouter from '../domains/surveys/routes';
 import { createLogger, createRequestLogger } from '../logger';
 import { StandardErrorSchema } from '../schema';
-import fetchRouter from './fetch';
-import headlinesRouter from './headlines';
-import publicationsRouter from './publications';
-import regionsRouter from './regions';
-import serperRouter from './serper';
-import settingsRouter from './settings';
-import statsRouter from './stats';
-import syncRouter from './sync';
 
 /**
  * Creates a main application router with all sub-routes
@@ -30,10 +23,7 @@ export function createAppRouter() {
       const requestLogger = createRequestLogger(logger, requestId);
       c.set('requestId', requestId);
       c.set('logger', requestLogger);
-      requestLogger.info('Request received', {
-        method: c.req.method,
-        path: c.req.path,
-      });
+      requestLogger.info({ method: c.req.method, path: c.req.path }, 'Request received');
       await next();
     } catch (error) {
       console.error('Error in logging middleware:', error);
@@ -44,14 +34,13 @@ export function createAppRouter() {
   // API root route
   app.get('/', async (c) => {
     const logger = c.get('logger');
-    logger.info('Root route accessed', {
-      headers: Object.fromEntries(c.req.raw.headers.entries()),
-    });
+    logger.info(
+      { headers: Object.fromEntries(c.req.raw.headers.entries()) },
+      'Root route accessed'
+    );
     return c.json({
       name: 'Early Studies Headlines Fetcher API',
-      version: '1.0.0',
-      documentation: '/docs',
-      openapi: '/openapi',
+      version: '2.0.0',
     });
   });
 
@@ -60,53 +49,10 @@ export function createAppRouter() {
     return new Response(null, { status: 204 });
   });
 
-  // Register OpenAPI specs
-  app.get(
-    '/openapi',
-    openAPISpecs(app, {
-      documentation: {
-        info: {
-          title: 'Early Studies Headlines Fetcher API',
-          version: '1.0.0',
-          description:
-            'API for fetching news headlines for Early Studies. Uses a standard response envelope { data, success, error }.',
-        },
-        servers: [
-          { url: 'http://localhost:8787', description: 'Local Development' },
-          { url: 'https://api.earlystudies.com', description: 'Production' },
-        ],
-        components: {
-          securitySchemes: {
-            bearerAuth: {
-              type: 'http',
-              scheme: 'bearer',
-              bearerFormat: 'JWT',
-            },
-          },
-        },
-        security: [{ bearerAuth: [] }],
-      },
-    })
-  );
-
-  // API documentation
-  app.get(
-    '/docs',
-    apiReference({
-      theme: 'saturn',
-      spec: { url: '/openapi' },
-    })
-  );
-
-  // Mount all the routers
-  app.route('/publications', publicationsRouter);
-  app.route('/regions', regionsRouter);
+  // Mount domain routers
   app.route('/headlines', headlinesRouter);
-  app.route('/settings', settingsRouter);
-  app.route('/stats', statsRouter);
-  app.route('/serper', serperRouter);
-  app.route('/', fetchRouter); // Routes like /headlines/fetch
-  app.route('/sync', syncRouter);
+  app.route('/surveys', surveysRouter);
+  app.route('/crm', crmRouter);
 
   // Global error handler
   app.onError((err, c) => {
@@ -124,33 +70,27 @@ export function createAppRouter() {
         code: 'VALIDATION_ERROR',
         details: err.flatten(),
       };
-      logger.warn('Validation error', {
-        path: c.req.path,
-        method: c.req.method,
-        errors: err.flatten(),
-      });
+      logger.warn(
+        { path: c.req.path, method: c.req.method, errors: err.flatten() },
+        'Validation error'
+      );
     } else if (err instanceof HTTPException) {
       statusCode = err.status;
       errorPayload = { message: err.message, code: `HTTP_${statusCode}` };
-      logger.error('HTTP exception', {
-        status: err.status,
-        message: err.message,
-        stack: err.stack,
-      });
+      logger.error(
+        { status: err.status, message: err.message, stack: err.stack },
+        'HTTP exception'
+      );
     } else if (err instanceof Error) {
       errorPayload = { message: err.message, code: 'UNHANDLED_EXCEPTION', details: err.stack };
-      logger.error('Unhandled application error', {
-        errorName: err.name,
-        errorMessage: err.message,
-        errorStack: err.stack,
-      });
+      logger.error({ err }, 'Unhandled application error');
     } else {
       errorPayload = {
         message: 'An unknown error occurred',
         code: 'UNKNOWN_ERROR',
         details: String(err),
       };
-      logger.error('Unknown error thrown', { error: err });
+      logger.error({ error: err }, 'Unknown error thrown');
     }
 
     c.status(statusCode as StatusCode);
@@ -164,14 +104,5 @@ export function createAppRouter() {
   return app;
 }
 
-// Export routers for direct access
-export {
-  fetchRouter,
-  headlinesRouter,
-  publicationsRouter,
-  regionsRouter,
-  serperRouter,
-  settingsRouter,
-  syncRouter,
-  statsRouter,
-};
+// Export domain routers for direct access
+export { headlinesRouter, surveysRouter, crmRouter };
