@@ -4,7 +4,8 @@ export default defineWorkersConfig({
   test: {
     poolOptions: {
       workers: {
-        wrangler: { configPath: './wrangler.toml' },
+        isolatedStorage: false,
+        wrangler: { configPath: './wrangler.json' },
         miniflare: {
           // Add any bindings needed for tests
           bindings: {
