@@ -1,0 +1,15 @@
+{
+  "extends": ["ultracite/core"],
+  "overrides": [
+    {
+      "includes": ["packages/db/src/schema/index.ts"],
+      "linter": {
+        "rules": {
+          "performance": {
+            "noBarrelFile": "off"
+          }
+        }
+      }
+    }
+  ]
+}

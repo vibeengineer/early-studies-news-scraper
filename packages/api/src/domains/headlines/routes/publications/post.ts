@@ -1,0 +1,24 @@
+import { publicationCategories } from "@early-studies/db/schema";
+import type { Context } from "hono";
+import { z } from "zod";
+import type { AuthenticatedAppContext } from "@/types";
+import { insertPublication } from "../../services/publications";
+
+const createSchema = z.object({
+  name: z.string(),
+  url: z.string(),
+  category: z.enum(publicationCategories).optional(),
+  region: z.string().optional(),
+});
+
+export async function createPublicationHandler(
+  c: Context<AuthenticatedAppContext>
+) {
+  const jsonData = await c.req.json();
+  const body = createSchema.parse(jsonData);
+  const publication = await insertPublication(
+    { database: c.env.DATABASE_URL },
+    body
+  );
+  return c.json({ success: true, data: { publication }, error: null }, 201);
+}

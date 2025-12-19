@@ -1,0 +1,30 @@
+{
+  "name": "@early-studies/db",
+  "version": "0.1.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./schema": "./src/schema/index.ts",
+    "./relations": "./src/relations.ts",
+    "./zod": "./src/zod.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "db:generate": "drizzle-kit generate",
+    "db:migrate": "drizzle-kit migrate",
+    "db:push": "drizzle-kit push",
+    "db:studio": "drizzle-kit studio"
+  },
+  "dependencies": {
+    "drizzle-orm": "^1.0.0-beta.2",
+    "drizzle-zod": "^1.0.0-beta.2",
+    "nanoid": "^5.0.9",
+    "pg": "^8.13.1"
+  },
+  "devDependencies": {
+    "@types/pg": "^8.11.10",
+    "dotenv": "^16.4.7",
+    "drizzle-kit": "1.0.0-beta.3-36e9b9e",
+    "typescript": "^5.5.2"
+  }
+}
